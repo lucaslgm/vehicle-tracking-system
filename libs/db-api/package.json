@@ -1,0 +1,18 @@
+{
+  "name": "@db/api",
+  "version": "1.0.0",
+  "main": "./generated/client/index.js",
+  "types": "./generated/client/index.d.ts",
+  "prisma": {
+    "schema": "./prisma/schema.prisma"
+  },
+  "scripts": {
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev --schema=./prisma/schema.prisma --name init-gateway-tables",
+    "generate": "dotenv -e ../../.env -- prisma generate --schema=./prisma/schema.prisma",
+    "studio": "dotenv -e ../../.env -- prisma studio --schema=./prisma/schema.prisma",
+    "reset": "dotenv -e ../../.env -- prisma migrate reset --schema=./prisma/schema.prisma --force"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7"
+  }
+}

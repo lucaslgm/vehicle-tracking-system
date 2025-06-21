@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@db/api": ["libs/db-api/src/index.ts"],
+      "@db/simulator": ["libs/db-simulator/src/index.ts"],
+      "@app/common": ["libs/common/src"],
+      "@app/common/*": ["libs/common/src/*"],
+      "@app/db-api": ["libs/db-api/src"],
+      "@app/db-api/*": ["libs/db-api/src/*"],
+      "@app/db-simulator": ["libs/db-simulator/src"],
+      "@app/db-simulator/*": ["libs/db-simulator/src/*"]
+    }
+  }
+}
