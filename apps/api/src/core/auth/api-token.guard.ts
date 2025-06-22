@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -20,21 +21,17 @@ export class ApiTokenGuard implements CanActivate {
       throw new UnauthorizedException('Invalid or missing API Token.');
     }
 
-    // Obtém o token secreto do ficheiro .env
     const secretToken = this.configService.get<string>('API_TOKEN');
 
     if (!secretToken) {
-      // Falha de segurança: se o token não estiver configurado no servidor, ninguém pode aceder.
-      console.error('API_TOKEN is not configured on the server.');
+      Logger.error('API_TOKEN is not configured on the server.');
       throw new UnauthorizedException();
     }
 
-    // Compara o token enviado pelo cliente com o token secreto.
     if (token !== secretToken) {
       throw new UnauthorizedException('Invalid or missing API Token.');
     }
 
-    // Se os tokens corresponderem, a requisição é permitida.
     return true;
   }
 }

@@ -1,19 +1,27 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateVehicleCommand } from '../impl/update-vehicle.command';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { VehicleRepository } from '../../../repositories/vehicle.repository';
+import { UpdateVehicleCommand } from './update-vehicle.command';
+import { UpdateVehicleResponse } from './update-vehicle.response';
 
 @CommandHandler(UpdateVehicleCommand)
 export class UpdateVehicleHandler
   implements ICommandHandler<UpdateVehicleCommand>
 {
+  private readonly logger = new Logger(UpdateVehicleHandler.name);
+
   constructor(private readonly repository: VehicleRepository) {}
 
-  async execute(command: UpdateVehicleCommand) {
-    const { id, dto } = command;
+  async execute(command: UpdateVehicleCommand): Promise<UpdateVehicleResponse> {
+    const { id, request } = command;
     try {
-      return await this.repository.update(id, dto);
+      const vehicle = await this.repository.update(id, request);
+      const response = new UpdateVehicleResponse(vehicle);
+      return response;
     } catch (error: unknown) {
+      this.logger.error(
+        `Failed to update vehicle with ID ${id}: ${JSON.stringify(error)}`,
+      );
       if (
         error &&
         typeof error === 'object' &&
@@ -32,7 +40,7 @@ export class UpdateVehicleHandler
         error.code === 'P2002'
       ) {
         throw new HttpException(
-          `Vehicle with license plate "${dto.license_plate}" or VIN "${dto.vin}" already exists.`,
+          `Vehicle with license plate "${request.license_plate}" or VIN "${request.vin}" already exists.`,
           HttpStatus.CONFLICT,
         );
       }

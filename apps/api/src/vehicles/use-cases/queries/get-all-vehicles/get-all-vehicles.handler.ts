@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetAllVehiclesQuery } from './get-all-vehicles.query';
-import { GetAllVehiclesResponseDto } from './get-all-vehicles.response';
+import { GetAllVehiclesResponse } from './get-all-vehicles.response';
 import { VehicleRepository } from 'apps/api/src/vehicles/repositories/vehicle.repository';
 
 @QueryHandler(GetAllVehiclesQuery)
@@ -9,9 +9,9 @@ export class GetAllVehiclesHandler
 {
   constructor(private readonly repository: VehicleRepository) {}
 
-  async execute(): Promise<GetAllVehiclesResponseDto> {
+  async execute(): Promise<GetAllVehiclesResponse> {
     const vehicles = await this.repository.findAll();
-    const response = new GetAllVehiclesResponseDto(vehicles);
+    const response = new GetAllVehiclesResponse(vehicles);
     return response;
   }
 }

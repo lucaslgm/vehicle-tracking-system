@@ -9,7 +9,3 @@ export interface IVehicleHistory {
   vehicleId: string;
   positions: Array<IPosition>;
 }
-
-export class GetVehicleHistoryResponse {
-  constructor(public readonly vehicleHistory: IVehicleHistory) {}
-}

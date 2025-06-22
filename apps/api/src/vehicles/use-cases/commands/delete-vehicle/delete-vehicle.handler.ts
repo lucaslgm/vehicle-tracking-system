@@ -1,18 +1,27 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DeleteVehicleCommand } from '../impl/delete-vehicle.command';
 import { VehicleRepository } from '../../../repositories/vehicle.repository';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { DeleteVehicleCommand } from './delete-vehicle.command';
+import { DeleteVehicleResponse } from './delete-vehicle.response';
 
 @CommandHandler(DeleteVehicleCommand)
 export class DeleteVehicleHandler
   implements ICommandHandler<DeleteVehicleCommand>
 {
+  private readonly logger = new Logger(DeleteVehicleCommand.name);
+
   constructor(private readonly repository: VehicleRepository) {}
 
-  async execute(command: DeleteVehicleCommand) {
+  async execute(command: DeleteVehicleCommand): Promise<DeleteVehicleResponse> {
     try {
-      return await this.repository.delete(command.id);
+      const vehicle = await this.repository.delete(command.id);
+      const response = new DeleteVehicleResponse(vehicle);
+      return response;
     } catch (error: unknown) {
+      this.logger.error(
+        `Failed to delete vehicle with ID ${command.id}: : ${JSON.stringify(error)}`,
+      );
+
       if (
         error &&
         typeof error === 'object' &&

@@ -2,7 +2,7 @@ import { LICENSE_PLATE_REGEX } from '@app/common/constants/regex';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
-export class CreateVehicleDto {
+export class CreateVehicleRequest {
   @ApiProperty({ example: 'ABC-1234', description: 'Placa do veículo' })
   @IsString()
   @IsNotEmpty()

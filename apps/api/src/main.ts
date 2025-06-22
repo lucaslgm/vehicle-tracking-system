@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
@@ -43,7 +43,6 @@ async function bootstrap() {
     customfavIcon: '/favicon-32x32.png',
   });
 
-  // Conecta-se à fila do RabbitMQ para atuar como um consumidor
   const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
 
   if (rabbitmqUrl) {
@@ -58,15 +57,17 @@ async function bootstrap() {
       },
     });
 
-    // Inicia o consumidor de mensagens
     await app.startAllMicroservices();
-    console.log('Microservice listener for RabbitMQ is running');
-  } else {
-    console.warn(
-      'RABBITMQ_URL not found, microservice listener is not running.',
+    Logger.log(
+      'Connected to RabbitMQ and listening for messages on queue: vehicle-positions',
     );
+  } else {
+    Logger.warn('RABBITMQ_URL not found, skipping microservice connection.');
   }
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  Logger.error('Error during application bootstrap', err);
+  process.exit(1);
+});

@@ -1,14 +1,6 @@
-export interface IVehicle {
-  id: string;
-  license_plate: string;
-  vin: string;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { IVehicle } from '../../../shared/interfaces/vehicle.interface';
 
-export class GetVehicleByIdResponseDto {
+export class GetVehicleByIdResponse {
   readonly vehicles: IVehicle;
 
   constructor(data: IVehicle) {

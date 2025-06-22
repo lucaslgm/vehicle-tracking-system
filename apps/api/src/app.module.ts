@@ -22,7 +22,6 @@ import { CommonModule, GlobalExceptionFilter } from '@app/common';
   ],
   controllers: [],
   providers: [
-    // Registra o ApiTokenGuard globalmente para proteger todos os endpoints.
     {
       provide: APP_GUARD,
       useClass: ApiTokenGuard,

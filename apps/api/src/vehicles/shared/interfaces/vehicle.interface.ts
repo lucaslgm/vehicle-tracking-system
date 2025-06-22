@@ -1,4 +1,4 @@
-export class VehicleResponseDto {
+export interface IVehicle {
   id: string;
   license_plate: string;
   vin: string;

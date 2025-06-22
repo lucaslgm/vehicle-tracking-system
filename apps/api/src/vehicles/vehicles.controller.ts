@@ -1,4 +1,4 @@
-// src/features/vehicles/vehicles.controller.ts
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   Controller,
   Post,
@@ -9,31 +9,41 @@ import {
   Param,
   Query,
   ParseUUIDPipe,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiParam,
   ApiSecurity,
   ApiBody,
 } from '@nestjs/swagger';
-
-// DTOs e Comandos/Queries
-import { CreateVehicleDto } from './dtos/create-vehicle.dto';
-import { VehicleResponseDto } from './dtos/vehicle.response.dto';
-import { CreateVehicleCommand } from './use-cases/commands/impl/create-vehicle.command';
-// import { PositionUpdateHandler } from './events/position-update.handler';
-import { UpdateVehicleCommand } from './use-cases/commands/impl/update-vehicle.command';
-import { DeleteVehicleCommand } from './use-cases/commands/impl/delete-vehicle.command';
-import { GetHistoryDto } from './dtos/get-history.dto';
-import { GetAllVehiclesQuery } from './use-cases/queries/get-all-vehicles/get-all-vehicles.query';
-import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
-import { GetVehicleByIdQuery } from './use-cases/queries/get-vehicle-by-id/get-vehicle-by-id.query';
-import { GetVehicleHistoryQuery } from './use-cases/queries/get-vehicle-history/get-vehicle-history.query';
+import {
+  GetAllVehiclesQuery,
+  GetAllVehiclesResponse,
+  GetVehicleByIdQuery,
+  GetVehicleByIdResponse,
+  GetVehicleHistoryRequest,
+  GetVehicleHistoryQuery,
+  GetVehicleHistoryResponse,
+} from './use-cases/queries';
+import {
+  CreateVehicleRequest,
+  CreateVehicleCommand,
+  CreateVehicleResponse,
+  UpdateVehicleRequest,
+  UpdateVehicleCommand,
+  UpdateVehicleResponse,
+  DeleteVehicleCommand,
+  DeleteVehicleResponse,
+} from './use-cases/commands';
+import {
+  ApiCreateResponse,
+  ApiDeleteResponse,
+  ApiReadAllByFilterResponse,
+  ApiReadAllResponse,
+  ApiReadOneResponse,
+  ApiUpdateResponse,
+} from './shared/swagger/api-responses';
 
 @ApiTags('Vehicles')
 @ApiSecurity('ApiToken')
@@ -42,107 +52,77 @@ export class VehiclesController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    // private readonly positionUpdateHandler: PositionUpdateHandler,
   ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new vehicle' })
-  @ApiResponse({
-    status: 201,
-    description: 'The vehicle has been successfully created.',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({
-    status: 409,
-    description: 'Vehicle with VIN or license plate already exists.',
-  })
-  @ApiBody({ type: CreateVehicleDto })
-  @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateVehicleRequest })
+  @ApiCreateResponse('Vehicle')
   async createVehicle(
-    @Body() createVehicleDto: CreateVehicleDto,
-  ): Promise<VehicleResponseDto> {
-    return this.commandBus.execute(new CreateVehicleCommand(createVehicleDto));
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'List all vehicles' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all vehicles with their current position.',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.queryBus.execute(new GetAllVehiclesQuery());
+    @Body() CreateVehicleRequest: CreateVehicleRequest,
+  ): Promise<CreateVehicleResponse> {
+    return this.commandBus.execute(
+      new CreateVehicleCommand(CreateVehicleRequest),
+    );
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a vehicle by its ID' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  @ApiResponse({ status: 200, description: 'Vehicle found.' })
-  @ApiResponse({ status: 400, description: 'Invalid ID format.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 404, description: 'Vehicle not found.' })
-  @HttpCode(HttpStatus.OK)
+  @ApiReadOneResponse('Vehicle')
   async getVehicleById(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<VehicleResponseDto> {
+  ): Promise<GetVehicleByIdResponse> {
     return this.queryBus.execute(new GetVehicleByIdQuery(id));
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'List all vehicles' })
+  @ApiReadAllResponse('Vehicles')
+  findAll(): Promise<GetAllVehiclesResponse> {
+    return this.queryBus.execute(new GetAllVehiclesQuery());
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a vehicle' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  @ApiBody({ type: UpdateVehicleDto })
-  @ApiResponse({
-    status: 200,
-    description: 'The vehicle has been successfully updated.',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  @ApiResponse({
-    status: 409,
-    description: 'Vehicle with VIN or license plate already exists.',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 404, description: 'Vehicle not found.' })
-  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: UpdateVehicleRequest })
+  @ApiUpdateResponse('Vehicle')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateVehicleDto,
-  ) {
-    return this.commandBus.execute(new UpdateVehicleCommand(id, dto));
+    @Body() request: UpdateVehicleRequest,
+  ): Promise<UpdateVehicleResponse> {
+    return this.commandBus.execute(new UpdateVehicleCommand(id, request));
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a vehicle' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  @ApiResponse({
-    status: 200,
-    description: 'The vehicle has been successfully deleted.',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid ID format.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 404, description: 'Vehicle not found.' })
-  @HttpCode(HttpStatus.OK)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  @ApiDeleteResponse('Vehicle')
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<DeleteVehicleResponse> {
     return this.commandBus.execute(new DeleteVehicleCommand(id));
   }
 
   @Get(':license_plate/history')
   @ApiOperation({ summary: "Get a vehicle's location history" })
   @ApiParam({ name: 'license_plate', type: 'string', example: 'ABC-1234' })
-  @ApiResponse({ status: 200, description: 'List of historical positions.' })
-  @ApiResponse({ status: 400, description: 'Invalid query parameters.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 404, description: 'Vehicle not found.' })
-  @HttpCode(HttpStatus.OK)
+  @ApiReadAllByFilterResponse('VehicleHistory', {
+    list: 'List of historical positions for the vehicle.',
+    invalidId: 'Invalid license plate format.',
+    notFound: 'Vehicle not found.',
+  })
   findHistory(
     @Param('license_plate') licensePlate: string,
-    @Query() dto: GetHistoryDto,
-  ) {
+    @Query() request: GetVehicleHistoryRequest,
+  ): Promise<GetVehicleHistoryResponse> {
     return this.queryBus.execute(
-      new GetVehicleHistoryQuery(licensePlate, dto.start_date, dto.end_date),
+      new GetVehicleHistoryQuery(
+        licensePlate,
+        request.start_date,
+        request.end_date,
+      ),
     );
   }
 }

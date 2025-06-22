@@ -1,21 +1,20 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
-import { VehicleHistoryResponseDto } from '../dtos/vehicle-history.response.dto';
+import { IVehicleHistory } from './vehicle-history.response';
 
 @Injectable()
 export class SimulatorService {
   private readonly simulatorApiUrl: string;
+  private readonly logger = new Logger(SimulatorService.name);
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     const url = this.configService.get<string>('SIMULATOR_API_URL');
-
-    console.log('SIMULATOR_API_URL:', url);
 
     if (!url) {
       throw new Error(
@@ -31,7 +30,7 @@ export class SimulatorService {
     license_plate: string;
   }): Promise<void> {
     try {
-      const url = `${this.simulatorApiUrl}/simulator/internal/vehicles`;
+      const url = `${this.simulatorApiUrl}/simulator/vehicles`;
       await firstValueFrom(this.httpService.post(url, data));
     } catch (error) {
       this.handleError(error as AxiosError, 'register vehicle in simulator');
@@ -42,15 +41,16 @@ export class SimulatorService {
     licensePlate: string,
     startDate: string,
     endDate: string,
-  ): Promise<VehicleHistoryResponseDto> {
+  ): Promise<IVehicleHistory> {
     try {
-      const url = `${this.simulatorApiUrl}/simulator/history/${licensePlate}`;
-      const response: AxiosResponse<VehicleHistoryResponseDto> =
-        await firstValueFrom(
-          this.httpService.get(url, {
-            params: { start_date: startDate, end_date: endDate },
-          }),
-        );
+      const url = `${this.simulatorApiUrl}/simulator/vehicles/${licensePlate}/history`;
+      const response: AxiosResponse<IVehicleHistory> = await firstValueFrom(
+        this.httpService.get(url, {
+          params: { start_date: startDate, end_date: endDate },
+        }),
+      );
+
+      this.logger.debug(response.data, `get history for plate ${licensePlate}`);
 
       const data = response.data;
       return data;
@@ -63,12 +63,11 @@ export class SimulatorService {
   }
 
   private handleError(error: AxiosError, context: string): never {
-    // Em um cenário real, poderíamos lançar uma exceção mais específica
-    // ou implementar um mecanismo de retry (tentar novamente).
-    console.error(
+    this.logger.error(
       `Error trying to ${context}:`,
       error.response?.data || error.message,
     );
+
     throw new HttpException(
       {
         message: `Failed to communicate with the simulator service.`,

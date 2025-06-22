@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsISO8601, IsNotEmpty } from 'class-validator';
 
-export class GetHistoryDto {
+export class GetVehicleHistoryRequest {
   @ApiProperty({
     description: 'Start date for the history query (ISO 8601 format)',
     example: '2025-06-20T00:00:00.000Z',

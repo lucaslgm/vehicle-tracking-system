@@ -1,7 +1,4 @@
-// Este não é um handler CQRS padrão, mas um listener de microserviço.
-// Vamos colocá-lo aqui por organização, mas ele será chamado pelo Controller.
-
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { VehicleRepository } from '../../repositories/vehicle.repository';
 
@@ -12,7 +9,8 @@ class PositionUpdatePayload {
 }
 
 @Controller()
-export class PositionUpdateHandler {
+export class PositionUpdateEventHandler {
+  private readonly logger: Logger = new Logger(PositionUpdateEventHandler.name);
   constructor(private readonly repository: VehicleRepository) {}
 
   @EventPattern('position_update')
@@ -20,14 +18,12 @@ export class PositionUpdateHandler {
     @Payload() data: PositionUpdatePayload,
     @Ctx() context: RmqContext,
   ) {
-    // const channel = context.getChannelRef();
-    const channel = context.getChannelRef();
+    const channel = context.getChannelRef(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     const originalMsg = context.getMessage();
 
     try {
-      console.log(`Received position update for VIN: ${data.vin}`);
+      this.logger.log(`Received position update for VIN: ${data.vin}`);
 
-      // Encontrar o veículo pelo VIN
       const vehicle = await this.repository.findByVin(data.vin);
 
       if (vehicle) {
@@ -35,16 +31,17 @@ export class PositionUpdateHandler {
           latitude: data.latitude,
           longitude: data.longitude,
         });
-        console.log(`Vehicle ${data.vin} position updated.`);
+
+        this.logger.log(`Vehicle ${data.vin} position updated.`);
       } else {
-        console.warn(
+        this.logger.warn(
           `Vehicle with VIN ${data.vin} not found in gateway DB. Ignoring message.`,
         );
       }
     } catch (error) {
-      console.error('Error processing position update message:', error);
-      // Em caso de erro, rejeita a mensagem, mas não a recoloca na fila
-      // para evitar loops de processamento infinitos.
+      this.logger.error('Error processing position update message:', error);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       channel.nack(originalMsg, false, false);
     }
   }
