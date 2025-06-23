@@ -50,8 +50,6 @@ export class SimulatorService {
         }),
       );
 
-      this.logger.debug(response.data, `get history for plate ${licensePlate}`);
-
       const data = response.data;
       return data;
     } catch (error) {
