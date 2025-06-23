@@ -39,6 +39,7 @@ O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de ve
 ## Configuração do Projeto
 
 1. **Clone o repositório:**
+
    ```bash
    git clone https://github.com/lucaslgm/vehicle-tracking-system
    cd vehicle-tracking-system
@@ -76,7 +77,7 @@ O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de ve
      app:
        build: .
        ports:
-         - "3000:3000"
+         - '3000:3000'
        env_file:
          - .env
        depends_on:
@@ -89,14 +90,14 @@ O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de ve
          POSTGRES_PASSWORD: sua_senha
          POSTGRES_DB: vehicle_tracking
        ports:
-         - "5432:5432"
+         - '5432:5432'
        volumes:
          - pgdata:/var/lib/postgresql/data
      rabbitmq:
        image: rabbitmq:3-management
        ports:
-         - "5672:5672"
-         - "15672:15672"
+         - '5672:5672'
+         - '15672:15672'
    volumes:
      pgdata:
    ```
@@ -104,6 +105,7 @@ O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de ve
 ## Executando com Docker
 
 1. **Build e start dos containers:**
+
    ```bash
    docker-compose up --build
    ```
@@ -127,10 +129,49 @@ O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de ve
    pnpm run db:generate:simulator
    ```
 
-3. **Acesse a aplicação:**
-   - A API estará disponível em: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+## Rodando a Aplicação
 
-4. **Parar os containers:**
+Após executar as etapas de configuração, siga os passos abaixo para rodar a aplicação em ambiente de desenvolvimento:
+
+1. **Suba os containers do banco de dados e RabbitMQ:**
+
+   ```bash
+   docker-compose up
+   ```
+
+2. **Execute as migrations do Prisma para criar as tabelas no banco de dados:**
+
+   ```bash
+   pnpm run db:migrate:api
+   pnpm run db:migrate:simulator
+   ```
+
+3. **Instale as dependências do projeto:**
+
+   ```bash
+   pnpm install
+   ```
+
+4. **Inicie a API e o simulador em modo desenvolvimento:**
+   - Para rodar apenas a API:
+     ```bash
+     pnpm run dev:api
+     ```
+   - Para rodar apenas o simulador:
+     ```bash
+     pnpm run dev:simulator
+     ```
+   - Para rodar ambos simultaneamente:
+     ```bash
+     pnpm run dev
+     ```
+
+5. **Acesse a documentação da API:**
+   - [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+
+---
+
+3. **Parar os containers:**
    ```bash
    docker-compose down
    ```
