@@ -1,98 +1,194 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vehicle Tracking System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este projeto é um sistema de rastreamento de veículos desenvolvido em **NestJS** com **TypeScript**, utilizando **PostgreSQL** como banco de dados e **RabbitMQ** para mensageria e eventos. O objetivo é monitorar e gerenciar frotas de veículos em tempo real.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Índice
 
-## Description
+- [Descrição](#descrição)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Pré-requisitos](#pré-requisitos)
+- [Configuração do Projeto](#configuração-do-projeto)
+- [Executando com Docker](#executando-com-docker)
+- [Comandos Úteis](#comandos-úteis)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Contribuição](#contribuição)
+- [Licença](#licença)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Descrição
 
-```bash
-$ pnpm install
+O Vehicle Tracking System permite o cadastro, monitoramento e rastreamento de veículos, fornecendo informações em tempo real sobre localização, status e histórico de trajetos.
+
+## Tecnologias Utilizadas
+
+- NestJS
+- TypeScript
+- PostgreSQL
+- RabbitMQ
+- Docker
+- Docker Compose
+- pnpm
+
+## Pré-requisitos
+
+- [Docker](https://www.docker.com/get-started) instalado
+- [Docker Compose](https://docs.docker.com/compose/install/) instalado
+- [pnpm](https://pnpm.io/installation) instalado
+
+## Configuração do Projeto
+
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/lucaslgm/vehicle-tracking-system
+   cd vehicle-tracking-system
+   ```
+
+2. **Crie o arquivo `.env`:**
+
+   É necessário criar um arquivo `.env` na raiz do projeto para definir as variáveis de ambiente utilizadas pela aplicação.
+   Em seguida, edite o arquivo `.env` e configure as seguintes variáveis (substitua os valores de usuário, senha e tokens conforme sua necessidade e segurança):
+
+   ```
+   # URL de conexão com o banco de dados PostgreSQL para a API
+   DATABASE_URL_API="postgresql://USUARIO:SENHA@localhost:5432/vehicle_tracking?schema=gateway"
+
+   # URL de conexão com o banco de dados PostgreSQL para o simulador
+   DATABASE_URL_SIMULATOR="postgresql://USUARIO:SENHA@localhost:5432/vehicle_tracking?schema=simulator"
+
+   # URL da API do simulador
+   SIMULATOR_API_URL="http://localhost:3001/simulator"
+
+   # URL de conexão com o RabbitMQ
+   RABBITMQ_URL="amqp://guest:guest@localhost:5672/"
+
+   # Token de autenticação da API
+   API_TOKEN="SEU_TOKEN_AQUI" (ex: EFQfjjDquUsD0FIKYyqaFTPCt7238q9mL8OGyZ2DF4FCJF5sDIKZIHEtZZg3pC15)
+   ```
+
+   > **Atenção:** Nunca compartilhe seus dados sensíveis (usuário, senha, tokens) em repositórios públicos.
+
+3. **Verifique o `docker-compose.yml`:**
+   Exemplo de configuração:
+   ```yaml
+   version: '3.8'
+   services:
+     app:
+       build: .
+       ports:
+         - "3000:3000"
+       env_file:
+         - .env
+       depends_on:
+         - db
+         - rabbitmq
+     db:
+       image: postgres:15
+       environment:
+         POSTGRES_USER: postgres
+         POSTGRES_PASSWORD: sua_senha
+         POSTGRES_DB: vehicle_tracking
+       ports:
+         - "5432:5432"
+       volumes:
+         - pgdata:/var/lib/postgresql/data
+     rabbitmq:
+       image: rabbitmq:3-management
+       ports:
+         - "5672:5672"
+         - "15672:15672"
+   volumes:
+     pgdata:
+   ```
+
+## Executando com Docker
+
+1. **Build e start dos containers:**
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **Execute as migrations do Prisma para criar as tabelas no banco de dados:**
+
+   Após os containers do PostgreSQL estarem em execução, rode os comandos abaixo para aplicar as migrations:
+
+   ```bash
+   # Para o banco da API
+   pnpm run db:migrate:api
+
+   # Para o banco do simulador
+   pnpm run db:migrate:simulator
+   ```
+
+   Se precisar gerar os clientes Prisma após alterações no schema, utilize:
+
+   ```bash
+   pnpm run db:generate:api
+   pnpm run db:generate:simulator
+   ```
+
+3. **Acesse a aplicação:**
+   - A API estará disponível em: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+
+4. **Parar os containers:**
+   ```bash
+   docker-compose down
+   ```
+
+## Comandos Úteis
+
+- Instalar dependências (local): `pnpm install`
+- Rodar testes: `pnpm test`
+- Acompanhar logs: `docker-compose logs -f app`
+
+## Estrutura de Pastas
+
+```
+vehicle-tracking-system/
+├── apps/
+│   └── api/
+│       ├── node_modules/
+│       ├── src/
+│       │   ├── core/
+│       │   ├── vehicles/
+│       │   │   ├── repositories/
+│       │   │   ├── services/
+│       │   │   ├── shared/
+│       │   │   └── use-cases/
+│       │   │       ├── commands/
+│       │   │       ├── events/
+│       │   │       │   ├── consumers/
+│       │   │       │   └── publishers/
+│       │   │       └── queries/
+│       │   │           ├── get-all-vehicles/
+│       │   │           ├── get-vehicle-by-id/
+│       │   │           └── get-vehicle-history/
+│       │   ├── vehicles.controller.ts
+│       │   ├── vehicles.module.ts
+│       │   ├── app.module.ts
+│       │   └── main.ts
+│       ├── test/
+│       ├── package.json
+│       ├── tsconfig.app.json
+│       └── tsconfig.json
+├── simulator/
+├── libs/
+│   └── common/
+│       ├── node_modules/
+│       ├── src/
+│       ├── package.json
+│       └── tsconfig.lib.json
+├── db-api/
 ```
 
-## Compile and run the project
+## Contribuição
 
-```bash
-# development
-$ pnpm run start
+1. Fork este repositório
+2. Crie uma branch: `git checkout -b feature/nova-feature`
+3. Commit suas alterações: `git commit -m 'feat: nova feature'`
+4. Push para o branch: `git push origin feature/nova-feature`
+5. Abra um Pull Request
 
-# watch mode
-$ pnpm run start:dev
+## Licença
 
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Este projeto está licenciado sob a [MIT License](LICENSE).
