@@ -1,4 +1,4 @@
-import { LICENSE_PLATE_REGEX } from '@app/common/constants/regex';
+import { LICENSE_PLATE_REGEX } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 

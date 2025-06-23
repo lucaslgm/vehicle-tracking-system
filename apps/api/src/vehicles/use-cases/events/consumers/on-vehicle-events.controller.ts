@@ -1,21 +1,16 @@
 import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
-import { VehicleRepository } from '../../repositories/vehicle.repository';
-
-class PositionUpdatePayload {
-  vin: string;
-  latitude: number;
-  longitude: number;
-}
+import { VehicleRepository } from '../../../repositories';
+import { PositionUpdatedEvent, PositionEventPatterns } from '@app/common';
 
 @Controller()
-export class PositionUpdateEventHandler {
-  private readonly logger: Logger = new Logger(PositionUpdateEventHandler.name);
+export class OnVehicleEventsController {
+  private readonly logger: Logger = new Logger(OnVehicleEventsController.name);
   constructor(private readonly repository: VehicleRepository) {}
 
-  @EventPattern('position_update')
+  @EventPattern(PositionEventPatterns.POSITION_UPDATE)
   async handlePositionUpdate(
-    @Payload() data: PositionUpdatePayload,
+    @Payload() data: PositionUpdatedEvent,
     @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment

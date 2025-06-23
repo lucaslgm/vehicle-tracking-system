@@ -15,6 +15,7 @@ import {
   RegisterVehiclePositionCommand,
   RegisterVehiclePositionRequest,
 } from 'apps/simulator/src/vehicles/use-cases/commands';
+import { PositionEventPatterns, PositionUpdatedEvent } from '@app/common';
 
 @Injectable()
 @CommandHandler(SimulateVehiclePositionsCommand)
@@ -51,9 +52,13 @@ export class SimulateVehiclePositionsHandler
         new RegisterVehiclePositionCommand(request),
       );
 
-      const message = { vin: vehicle.vin, latitude, longitude };
       this.logger.log(`Emitting position_update event for ${vehicle.vin}`);
-      this.client.emit('position_update', message);
+      const message = new PositionUpdatedEvent(
+        vehicle.vin,
+        latitude,
+        longitude,
+      );
+      this.client.emit(PositionEventPatterns.POSITION_UPDATE, message);
     }
   }
 

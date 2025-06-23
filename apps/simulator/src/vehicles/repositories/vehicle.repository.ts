@@ -63,4 +63,30 @@ export class VehicleRepository {
       data: { vehicleId, latitude, longitude },
     });
   }
+
+  async deleteByVinOrPlate(
+    vin: string,
+    license_plate: string,
+  ): Promise<IVehicle | null> {
+    if (vin) {
+      return this.prisma.vehicle.delete({
+        where: { vin },
+      });
+    } else {
+      return this.prisma.vehicle.delete({
+        where: { license_plate },
+      });
+    }
+  }
+
+  async updateByVin(
+    oldVin: string,
+    vin: string,
+    license_plate: string,
+  ): Promise<IVehicle | null> {
+    return this.prisma.vehicle.update({
+      where: { vin: oldVin },
+      data: { vin, license_plate },
+    });
+  }
 }

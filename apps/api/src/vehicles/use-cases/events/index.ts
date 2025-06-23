@@ -1,1 +1,2 @@
-export * from './vehicle-position-update.event-handler';
+export * from './consumers';
+export * from './publishers';

@@ -12,6 +12,7 @@ import {
   GetAllVehiclesHandler,
   GetVehiclePositionHistoryHandler,
 } from './use-cases/queries';
+import { OnVehicleEventsController } from './use-cases/events';
 
 export const CommandHandlers = [
   RegisterVehicleHandler,
@@ -22,9 +23,11 @@ export const QueryHandlers = [
   GetVehiclePositionHistoryHandler,
 ];
 
+export const EventControllers = [OnVehicleEventsController];
+
 @Module({
   imports: [CqrsModule, PrismaModule, ConfigModule],
-  controllers: [VehicleController],
+  controllers: [VehicleController, ...EventControllers],
   providers: [...CommandHandlers, ...QueryHandlers, VehicleRepository],
   exports: [VehicleRepository],
 })

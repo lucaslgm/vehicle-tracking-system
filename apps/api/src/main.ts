@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { RmqQueue } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -50,7 +51,7 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: [rabbitmqUrl],
-        queue: 'vehicle-positions',
+        queue: RmqQueue.VEHICLE_POSITIONS,
         queueOptions: {
           durable: true,
         },
@@ -59,7 +60,7 @@ async function bootstrap() {
 
     await app.startAllMicroservices();
     Logger.log(
-      'Connected to RabbitMQ and listening for messages on queue: vehicle-positions',
+      `Connected to RabbitMQ and listening for messages on queue: ${RmqQueue.VEHICLE_POSITIONS}`,
     );
   } else {
     Logger.warn('RABBITMQ_URL not found, skipping microservice connection.');

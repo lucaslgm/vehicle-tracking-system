@@ -5,7 +5,11 @@ import { PrismaModule } from '../core/database';
 import { VehiclesController } from './vehicles.controller';
 import { VehicleRepository } from './repositories';
 import { SimulatorService } from './services';
-import { PositionUpdateEventHandler } from './use-cases/events/';
+import { RabbitMQClientModule, RmqQueue } from '@app/common';
+import {
+  OnVehicleEventsController,
+  VehicleEventsPublisher,
+} from './use-cases/events/';
 import {
   GetAllVehiclesHandler,
   GetVehicleByIdHandler,
@@ -28,14 +32,26 @@ export const QueryHandlers = [
   GetVehicleHistoryHandler,
 ];
 
+export const EventPublishers = [VehicleEventsPublisher];
+
 @Module({
-  imports: [CqrsModule, PrismaModule, HttpModule],
-  controllers: [VehiclesController, PositionUpdateEventHandler],
+  imports: [
+    CqrsModule,
+    PrismaModule,
+    HttpModule,
+    RabbitMQClientModule.register({
+      name: 'RABBITMQ_SERVICE',
+      queue: RmqQueue.VEHICLES_EVENTS,
+      withDLQ: true,
+    }),
+  ],
+  controllers: [VehiclesController, OnVehicleEventsController],
   providers: [
     VehicleRepository,
     SimulatorService,
     ...CommandHandlers,
     ...QueryHandlers,
+    ...EventPublishers,
   ],
 })
 export class VehiclesModule {}
