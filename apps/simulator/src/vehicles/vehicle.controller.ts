@@ -1,3 +1,4 @@
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   Controller,
   Post,
@@ -7,7 +8,6 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   RegisterVehicleRequest,
   RegisterVehicleCommand,
@@ -18,6 +18,7 @@ import {
   GetVehiclePositionHistoryResponse,
   GetVehiclePositionHistoryQuery,
 } from './use-cases/queries';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('vehicles')
 export class VehicleController {
@@ -27,6 +28,7 @@ export class VehicleController {
   ) {}
 
   @Post()
+  @ApiExcludeEndpoint()
   async registerVehicle(
     @Body(new ValidationPipe()) request: RegisterVehicleRequest,
   ): Promise<RegisterVehicleResponse> {

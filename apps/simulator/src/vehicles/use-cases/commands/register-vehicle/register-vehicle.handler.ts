@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RegisterVehicleCommand, RegisterVehicleResponse } from '.';
 import { ConflictException, Logger } from '@nestjs/common';
 import { VehicleRepository } from '../../../repositories';
-import { IVehicle } from '../../../shared/interfaces/vehicle.interface';
 
 @CommandHandler(RegisterVehicleCommand)
 export class RegisterVehicleHandler

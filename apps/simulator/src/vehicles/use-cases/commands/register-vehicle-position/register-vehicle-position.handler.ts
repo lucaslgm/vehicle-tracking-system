@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { RegisterVehiclePositionCommand } from './register-vehicle-position.command';
 import { VehicleRepository } from '../../../repositories';
-import { IVehiclePosition } from '../../../shared/interfaces/vehicle-position.interface';
+import { IVehiclePosition } from '../../../shared';
 import { RegisterVehiclePositionRequestResponse } from './register-vehicle-position.response';
 
 @CommandHandler(RegisterVehiclePositionCommand)

@@ -43,7 +43,7 @@ import {
   ApiReadAllResponse,
   ApiReadOneResponse,
   ApiUpdateResponse,
-} from './shared/swagger/api-responses';
+} from './shared';
 
 @ApiTags('Vehicles')
 @ApiSecurity('ApiToken')

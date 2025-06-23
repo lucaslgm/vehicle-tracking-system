@@ -1,4 +1,4 @@
-import { IVehicle } from '../../../shared/interfaces/vehicle.interface';
+import { IVehicle } from '../../../shared';
 
 export class RegisterVehicleResponse {
   constructor(public readonly vehicle: IVehicle) {}

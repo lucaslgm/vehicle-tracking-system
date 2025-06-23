@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../core/database/prisma/prisma.service';
-import { IVehicle } from '../shared/interfaces/vehicle.interface';
-import { IVehiclePosition } from '../shared/interfaces/vehicle-position.interface';
+import { PrismaService } from '../../core/database';
+import { IVehicle } from '../shared';
+import { IVehiclePosition } from '../shared';
 
 @Injectable()
 export class VehicleRepository {

@@ -3,11 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
 export class CreateVehicleRequest {
-  @ApiProperty({ example: 'ABC-1234', description: 'Placa do veículo' })
+  @ApiProperty({ example: 'ABC-1234', description: 'Vehicle license plate' })
   @IsString()
   @IsNotEmpty()
   @Matches(LICENSE_PLATE_REGEX, {
-    message: 'A placa deve estar no formato ABC-1234 ou ABC1D23',
+    message: 'The license plate must be in the format ABC-1234 or ABC1D23',
   })
   license_plate: string;
 

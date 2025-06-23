@@ -1,4 +1,4 @@
-import { IVehiclePosition } from '../../../shared/interfaces/vehicle-position.interface';
+import { IVehiclePosition } from '../../../shared';
 
 export class RegisterVehiclePositionRequestResponse {
   constructor(public readonly vehiclePosition: IVehiclePosition) {}

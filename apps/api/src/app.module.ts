@@ -5,8 +5,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from './core/database/prisma/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ApiTokenGuard } from './core/auth/api-token.guard';
-import { CommonModule, GlobalExceptionFilter } from '@app/common';
+import {
+  ApiTokenGuard,
+  CommonModule,
+  GlobalExceptionFilter,
+} from '@app/common';
 
 @Module({
   imports: [

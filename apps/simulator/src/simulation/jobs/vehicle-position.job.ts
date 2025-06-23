@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { CommandBus } from '@nestjs/cqrs';
-import { SimulateVehiclePositionsCommand } from '../use-cases/simulate-vehicle-positions/simulate-vehicle-positions.command';
+import { SimulateVehiclePositionsCommand } from '../use-cases';
 
 @Injectable()
 export class VehiclePositionJob {

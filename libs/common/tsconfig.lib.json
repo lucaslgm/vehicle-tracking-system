@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "../../dist/libs/common"
+    "outDir": "../../dist/libs/common",
+    "baseUrl": ".",
+    "paths": {
+      "@app/common": ["libs/common/src/index.ts"] // Exemplo de alias
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
